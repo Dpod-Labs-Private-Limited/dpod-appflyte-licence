@@ -1,0 +1,15 @@
+services:
+  ameya-web-service-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3000"
+    env_file:
+      - .env
+    networks:
+      - appflyte
+
+networks:
+  appflyte:
+      external: true

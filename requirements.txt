@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic
+boto3
+PyJWT
+cryptography
+Werkzeug
+python-multipart
+python-dotenv
