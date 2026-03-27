@@ -1,15 +1,13 @@
 services:
-  ameya-web-service-test:
+  fastapi-app:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: dpod-appflyte-licence-service
     ports:
-      - "3005:3000"
+      - "8007:8007"
     env_file:
       - .env
-    networks:
-      - appflyte
-
-networks:
-  appflyte:
-      external: true
+    volumes:
+      - .:/app
+    restart: always

@@ -9,7 +9,7 @@ from src.utils.creds_utils import get_licence_creds
 from src.utils.models_utils import GenerateLicenceRequest, LicenceRequest, RenewLicenceRequest
 
 logger = logging.getLogger(__name__)
-app = FastAPI()
+app = FastAPI(docs_url="/", redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
