@@ -1,15 +1,24 @@
+
+import os
 import jwt
 import logging
-from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Security, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyHeader
 
 from src.services.licence_service import get_licence, generate_root_user_token
 from src.services.aws_service import store_license
 from src.utils.creds_utils import get_licence_creds
 from src.utils.models_utils import GenerateLicenceRequest, LicenceRequest, RenewLicenceRequest
 
+load_dotenv()
+API_KEY = os.getenv("API_KEY", "my-secret-key")
+API_KEY_NAME = "x-api-key"
+
 logger = logging.getLogger(__name__)
 app = FastAPI(docs_url="/", redoc_url=None)
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,6 +27,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+def verify_api_key(api_key: str = Security(api_key_header)):
+    if api_key == API_KEY:
+        return api_key
+    raise HTTPException(status_code=403, detail="Invalid or missing API Key")
 
 def handler(data: LicenceRequest):
     
@@ -42,7 +56,7 @@ def handler(data: LicenceRequest):
     return new_licence
     
 @app.post("/license/generate")
-def generate_licence(req: GenerateLicenceRequest):
+def generate_licence(req: GenerateLicenceRequest, api_key: str = Depends(verify_api_key)):
     try:
        
         account_details = get_licence_creds()    
@@ -75,7 +89,7 @@ def generate_licence(req: GenerateLicenceRequest):
         raise HTTPException(status_code=404, detail="Unable to generate licence")
     
 @app.post("/license/renew")
-def renew_licence(req: RenewLicenceRequest):
+def renew_licence(req: RenewLicenceRequest, api_key: str = Depends(verify_api_key)):
     try:
            
         try:
