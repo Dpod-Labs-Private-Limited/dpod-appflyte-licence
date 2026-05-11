@@ -63,25 +63,36 @@ def generate_licence(req: GenerateLicenceRequest, api_key: str = Depends(verify_
         account_id = account_details["account_id"]
         subscriber_id = account_details["subscriber_id"]
         subscription_id = account_details["subscription_id"]
+
+        service_type = req.service_type
         root_user_id = account_details["user_id"]
-                
+        root_username = req.mail_id
+
         aws_access_key_id = req.aws_access_key_id
         aws_secret_access_key = req.aws_secret_access_key
         region_name = req.region_name
-        root_username = req.mail_id
-        service_type = req.service_type
+        
+        azure_access_key_id = req.azure_access_key_id
+        
+        s3_access_key_id = req.s3_access_key_id
+        s3_secret_access_key = req.s3_secret_access_key
+        s3_region_name = req.s3_region_name
 
         response = handler(LicenceRequest(
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            region_name=region_name,
             account_id=account_id,
             subscriber_id=subscriber_id,
             subscription_id=subscription_id,
+            service_type=service_type,
             root_user_id=root_user_id,
             root_username=root_username,
-            service_type=service_type)
-        )        
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            region_name=region_name,
+            azure_access_key_id=azure_access_key_id,
+            s3_access_key_id=s3_access_key_id,
+            s3_secret_access_key=s3_secret_access_key,
+            s3_region_name=s3_region_name
+        ))        
         return response
 
     except Exception as e:
@@ -100,25 +111,36 @@ def renew_licence(req: RenewLicenceRequest, api_key: str = Depends(verify_api_ke
         account_id = decoded_payload['root_account_id']
         subscriber_id = decoded_payload['subscriber_id']
         subscription_id = decoded_payload['subscription_id']
+
+        service_type = req.service_type
         root_user_id = decoded_payload['root_user_id']
         root_username = decoded_payload['root_username']
 
         aws_access_key_id = req.aws_access_key_id
         aws_secret_access_key = req.aws_secret_access_key
         region_name = req.region_name
-        service_type = req.service_type
+        
+        azure_access_key_id = req.azure_access_key_id
+        
+        s3_access_key_id = req.s3_access_key_id
+        s3_secret_access_key = req.s3_secret_access_key
+        s3_region_name = req.s3_region_name
 
         response = handler(LicenceRequest(
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            region_name=region_name,
             account_id=account_id,
             subscriber_id=subscriber_id,
             subscription_id=subscription_id,
+            service_type=service_type,
             root_user_id=root_user_id,
             root_username=root_username,
-            service_type=service_type)
-        )
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            region_name=region_name,
+            azure_access_key_id=azure_access_key_id,
+            s3_access_key_id=s3_access_key_id,
+            s3_secret_access_key=s3_secret_access_key,
+            s3_region_name=s3_region_name
+        ))
         
         return response
 

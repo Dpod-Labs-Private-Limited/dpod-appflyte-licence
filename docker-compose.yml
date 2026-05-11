@@ -5,9 +5,10 @@ services:
       dockerfile: Dockerfile
     container_name: dpod-appflyte-licence-service
     ports:
-      - "8007:8007"
+      - "8011:8007"
     env_file:
       - .env
     volumes:
       - .:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8007 --reload --reload-dir /app/src
     restart: always

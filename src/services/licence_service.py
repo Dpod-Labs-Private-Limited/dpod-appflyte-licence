@@ -68,6 +68,8 @@ def generate_licence(data:LicenceRequest, body:dict):
     else:
         azure_database_details = body["database_details"]
         azure_service_details = body["service_details"]
+        
+    s3_bucket_details = body.get("s3_bucket_details", None)
 
     jwt_token_payload = {
         "root_account_id": account_id,
@@ -78,13 +80,14 @@ def generate_licence(data:LicenceRequest, body:dict):
         "subscription_id": subscription_id,
         "subscription_start_date": trialStartDateStr,
         "subscription_end_date": trialEndDateStr,
-        "app_subscribed": ["appflyte-frontend", "appflyte-backend", "Impilos", "ISSAC", "Ameya"],
+        "app_subscribed": ["appflyte-frontend", "appflyte-backend", "Impilos", "ISSAC", "Ameya", "Appflyte"],
         "database": body["database"],
         "hash_secret": hash_secret,
         "dynamo": aws_database_details,
         "cosmos": azure_database_details,
         "aws": aws_service_details,
-        "azure": azure_service_details
+        "azure": azure_service_details,
+        "s3_bucket": s3_bucket_details
     }
     
     jwt_token = UtilityService.create_jwt(payload=jwt_token_payload, private_key=private_key, exp_date=trialEndDate)
@@ -94,10 +97,7 @@ def get_licence(data:LicenceRequest):
     
     subscription_id = data.subscription_id
     service_type = data.service_type
-    aws_access_key_id = data.aws_access_key_id
-    aws_secret_access_key = data.aws_secret_access_key
-    aws_region_name = data.region_name
-    
+        
     req_body = {
         "database": None,
         "service_details": None,
@@ -105,7 +105,11 @@ def get_licence(data:LicenceRequest):
     }
 
     if service_type == 'aws':
-            
+        
+        aws_access_key_id = data.aws_access_key_id
+        aws_secret_access_key = data.aws_secret_access_key
+        aws_region_name = data.region_name
+
         req_body['database'] = "dynamo"
         
         req_body['service_details'] = {
@@ -118,10 +122,26 @@ def get_licence(data:LicenceRequest):
             "access_key": aws_access_key_id,
             "table_name": f"applyte-table-{subscription_id}"
         }
-
+        
     else:
-        pass
-    
+        
+        azure_access_key_id = data.azure_access_key_id
+        
+        req_body['database'] = "cosmos"
+        
+        req_body['database_details'] = {
+            "container_name": f"applyte-table-{subscription_id}",
+            "azure_access_key_id": azure_access_key_id,
+            "database_name": f"appflyte-db-{subscription_id}"
+        }
+
+    if data.s3_access_key_id and data.s3_secret_access_key and data.s3_region_name:
+        req_body['s3_bucket_details'] = {
+            "aws_access_key_id": data.s3_access_key_id,
+            "aws_secret_access_key": data.s3_secret_access_key,
+            "region_name": data.s3_region_name
+        }
+        
     jwt_token, public_key, generated_password = generate_licence(data, req_body)    
     public_key = public_key.encode('utf-8')
     

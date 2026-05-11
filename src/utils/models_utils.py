@@ -8,26 +8,46 @@ class ServiceType(str, Enum):
     
 class GenerateLicenceRequest(BaseModel):
     mail_id: str
+    service_type: ServiceType
     aws_access_key_id: Optional[str] = None
     aws_secret_access_key: Optional[str] = None
     region_name: Optional[str] = None
-    service_type: ServiceType
+    azure_access_key_id: Optional[str] = None
+    s3_access_key_id: Optional[str] = None
+    s3_secret_access_key: Optional[str] = None
+    s3_region_name: Optional[str] = None
     
 class RenewLicenceRequest(BaseModel):
-    aws_access_key_id: Optional[str] = None
-    aws_secret_access_key: Optional[str] = None
-    region_name: Optional[str] = None
+    
     service_type: ServiceType
     licence_token: str
     public_key: str
     
+    aws_access_key_id: Optional[str] = None
+    aws_secret_access_key: Optional[str] = None
+    region_name: Optional[str] = None
+    
+    azure_access_key_id: Optional[str] = None
+    s3_access_key_id: Optional[str] = None
+    s3_secret_access_key: Optional[str] = None
+    s3_region_name: Optional[str] = None
+    
 class LicenceRequest(BaseModel):
-    aws_access_key_id:str
-    aws_secret_access_key:str
-    region_name:str
-    account_id:str
-    subscriber_id:str
-    subscription_id:str
-    root_user_id:str
-    root_username:str
-    service_type:str
+
+    account_id: Optional[str] = None
+    subscriber_id: Optional[str] = None
+    subscription_id: Optional[str] = None
+
+    service_type: Optional[str] = None
+    root_user_id: Optional[str] = None
+    root_username: Optional[str] = None
+     
+    aws_access_key_id: Optional[str] = None
+    aws_secret_access_key: Optional[str] = None
+    region_name: Optional[str] = None
+    
+    azure_access_key_id: Optional[str] = None
+    
+    s3_access_key_id: Optional[str] = None
+    s3_secret_access_key: Optional[str] = None
+    s3_region_name: Optional[str] = None
