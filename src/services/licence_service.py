@@ -16,20 +16,18 @@ def get_curr_datetime_str() -> str:
     return dt_str
 
 def generate_key_pair(subscriber_id:str):
-    
-    # Generate key pair
-    generated_key_pair = UtilityService.generate_key_pair()
-    
+
     stage = UtilityService.get_stage()
     secret_name = 'App-Flyte/Key-Pair/{}/{}'.format(stage, subscriber_id)
-    
-    # Check if secret name exists
+
+    # Check if secret name exists; only generate a new key pair if it doesn't
     if not AwsSecretService.if_secret_name_exists(secret_name=secret_name):
+        generated_key_pair = UtilityService.generate_key_pair()
         AwsSecretService.create_aws_secret(secret_name=secret_name, secret_value=json.dumps(generated_key_pair))
-        
+
     # Fetch key pair from the AWS secrets manager
     fetched_secret = AwsSecretService.get_aws_secret(secret_name)
-    return json.dumps(fetched_secret)
+    return fetched_secret
 
 def generate_licence(data:LicenceRequest, body:dict):
     
@@ -46,10 +44,7 @@ def generate_licence(data:LicenceRequest, body:dict):
     azure_service_details = None
 
     # Generate key pair
-    response = generate_key_pair(subscriber_id)
-
-    while isinstance(response, str):
-        response = json.loads(response)
+    response = json.loads(generate_key_pair(subscriber_id))
 
     public_key = response['public_key']
     private_key = response['private_key']
@@ -169,11 +164,6 @@ def generate_root_user_token(jwt_token, public_key, algorithm = 'HS256'):
     key = root_username + subscriber_id + subscription_id
     encrypted_userinfo = UtilityService.generate_salt(key, password)
     
-    # Expiration of the token should be 24 hr from generation
-    curr_time = datetime.datetime.utcnow()
-    exp_time = curr_time + datetime.timedelta(hours=24)
-    exp_timestamp = int(exp_time.timestamp())
-
     # For temporary : Expiration of the token should be same as license expiration
     exp_datetime = datetime.datetime.strptime(trial_end_date, "%Y-%m-%d")
     exp_timestamp = int(exp_datetime.timestamp())

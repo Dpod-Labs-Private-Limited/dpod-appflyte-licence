@@ -48,8 +48,6 @@ class UtilityService:
         # Generate the salt as a hexadecimal string
         salt = hmac_obj.hexdigest()
 
-        print(f"Hash secret : {salt}")
-
         return salt
 
     def create_jwt(payload, private_key, exp_date=None, algorithm='RS256'):
